@@ -77,7 +77,15 @@ class BazelBspAspectsManager(
 
   private fun List<RulesetLanguage>.addExternalPythonLanguageIfNeeded(externalRulesetNames: List<String>): List<RulesetLanguage> {
     val rulesetName = Language.Python.rulesetNames.firstOrNull { externalRulesetNames.contains(it) }
-    return this.filterNot { it.language == Language.Python } + RulesetLanguage(rulesetName, Language.Python)
+    return when {
+      bazelRelease.major >= 8 ->
+        if (featureFlags.isPythonSupportEnabled)
+          this.filterNot { it.language == Language.Python } + RulesetLanguage(rulesetName, Language.Python)
+        else this
+      else ->
+        // For bazel version < 8, python is embedded.
+        this.filterNot { it.language == Language.Python } + RulesetLanguage(rulesetName, Language.Python)
+    }
   }
 
   fun generateAspectsFromTemplates(
