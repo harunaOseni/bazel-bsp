@@ -16,7 +16,11 @@ class TypeScriptLanguagePlugin(private val bazelPathsResolver: BazelPathsResolve
     val tsInfo = targetInfo.typescriptTargetInfo
 
     return TypeScriptModule(
-      sources = tsInfo.sourcesList.map { java.nio.file.Paths.get(it) }
+      sources =
+        tsInfo.sourcesList.map {
+          java.nio.file.Paths
+            .get(it)
+        },
     )
   }
 }
